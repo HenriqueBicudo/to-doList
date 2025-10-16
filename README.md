@@ -88,8 +88,9 @@ Este projeto implementa 6 ferramentas de qualidade de software:
 - **Build:** Validado automaticamente
 
 ### 6. 📋 Gestão de Testes (Qase)
-- **Casos de teste:** Em documentação
-- **Taxa de aprovação:** Em progresso
+- **Casos de teste:** 32 casos documentados
+- **Taxa de aprovação:** 87.5% (28/32)
+- **Documentação completa:** [docs/test-cases.md](docs/test-cases.md)
 
 ## 📋 API Endpoints
 
