@@ -1,0 +1,29 @@
+# Variables
+@baseUrl = http://localhost:3000
+
+# Health check
+# @name healthCheck
+GET {{baseUrl}}/health
+
+###
+
+# Health check
+# @name healthCheck
+GET {{baseUrl}}/health
+###
+
+# listTasks
+# @name listTasks
+GET {{baseUrl}}/tasks
+###
+
+# createTask
+# @name createTask
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "titulo": "Nova Task"
+}
+
+

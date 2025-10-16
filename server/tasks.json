@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "titulo": "Estudar testes automatizados no Node.js",
+    "feito": false
+  },
+  {
+    "id": 2,
+    "titulo": "Criar repositório no GitHub para a API de To-Do List",
+    "feito": false
+  },
+  {
+    "id": 3,
+    "titulo": "Rodar análise de código no SonarCloud",
+    "feito": false
+  },
+  {
+    "id": 4,
+    "titulo": "Executar teste de performance com K6",
+    "feito": false
+  },
+  {
+    "id": 5,
+    "titulo": "Verificar vulnerabilidades com Snyk",
+    "feito": false
+  },
+  {
+    "id": 6,
+    "titulo": "Documentar casos de teste no Qase",
+    "feito": false
+  },
+  {
+    "id": 7,
+    "titulo": "Configurar pipeline de CI/CD no GitLab",
+    "feito": false
+  }
+]
