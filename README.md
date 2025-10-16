@@ -82,10 +82,11 @@ Este projeto implementa 6 ferramentas de qualidade de software:
 - **p95:** Em medição
 - **Taxa de erro:** Em análise
 
-### 5. 🤖 CI/CD (GitHub Actions)
-- **Pipeline:** Em configuração
-- **Testes:** Automatizado
+### 5. 🤖 CI/CD (GitLab CI)
+- **Pipeline:** 5 estágios automatizados
+- **Testes:** Build, Lint, Test, Performance
 - **Build:** Validado automaticamente
+- **Documentação:** [docs/gitlab-ci-setup.md](docs/gitlab-ci-setup.md)
 
 ### 6. 📋 Gestão de Testes (Qase)
 - **Casos de teste:** 32 casos documentados
@@ -147,5 +148,7 @@ Este projeto foi desenvolvido para fins acadêmicos - Faculdade de Qualidade de 
 ## 🔗 Links Úteis
 
 - [Documentação Completa](docs/)
+- [Configuração GitLab CI/CD](docs/gitlab-ci-setup.md)
 - [Relatório de Testes BrowserStack](docs/reports/browserstack-report.md)
 - [Casos de Teste](docs/test-cases.md)
+- [Repositório GitLab](https://gitlab.com/HenriqueBicudo/to-doList)

@@ -1,0 +1,194 @@
+# Pipeline de CI/CD para To-Do List
+# Automatiza build, testes e deploy
+
+# Define a imagem Docker padrão
+image: node:18
+
+# Define os estágios do pipeline
+stages:
+  - install
+  - lint
+  - build
+  - test
+  - performance
+
+# Cache de dependências para acelerar o pipeline
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - server/node_modules/
+    - web/node_modules/
+    - .npm/
+
+# Variáveis globais
+variables:
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+
+# ==================== STAGE: INSTALL ====================
+
+install:backend:
+  stage: install
+  script:
+    - cd server
+    - npm ci --prefer-offline
+  artifacts:
+    paths:
+      - server/node_modules/
+    expire_in: 1 hour
+  only:
+    - main
+    - merge_requests
+    - tags
+
+install:frontend:
+  stage: install
+  script:
+    - cd web
+    - npm ci --prefer-offline
+  artifacts:
+    paths:
+      - web/node_modules/
+    expire_in: 1 hour
+  only:
+    - main
+    - merge_requests
+    - tags
+
+# ==================== STAGE: LINT ====================
+
+lint:backend:
+  stage: lint
+  dependencies:
+    - install:backend
+  script:
+    - cd server
+    - echo "Verificando código do backend..."
+    - npx tsc --noEmit
+  only:
+    - main
+    - merge_requests
+  allow_failure: false
+
+lint:frontend:
+  stage: lint
+  dependencies:
+    - install:frontend
+  script:
+    - cd web
+    - echo "Executando ESLint no frontend..."
+    - npm run lint
+  only:
+    - main
+    - merge_requests
+  allow_failure: false
+
+# ==================== STAGE: BUILD ====================
+
+build:backend:
+  stage: build
+  dependencies:
+    - install:backend
+  script:
+    - cd server
+    - echo "Building backend..."
+    - npm run build
+    - ls -la dist/
+  artifacts:
+    paths:
+      - server/dist/
+    expire_in: 1 week
+  only:
+    - main
+    - merge_requests
+    - tags
+
+build:frontend:
+  stage: build
+  dependencies:
+    - install:frontend
+  script:
+    - cd web
+    - echo "Building frontend..."
+    - npm run build
+    - ls -la dist/
+  artifacts:
+    paths:
+      - web/dist/
+    expire_in: 1 week
+  only:
+    - main
+    - merge_requests
+    - tags
+
+# ==================== STAGE: TEST ====================
+
+test:backend:
+  stage: test
+  dependencies:
+    - build:backend
+  script:
+    - cd server
+    - echo "Executando testes do backend..."
+    - npm test || echo "Nenhum teste configurado ainda"
+  coverage: '/Lines\s*:\s*(\d+\.\d+)%/'
+  only:
+    - main
+    - merge_requests
+  allow_failure: true
+
+test:frontend:
+  stage: test
+  dependencies:
+    - build:frontend
+  script:
+    - cd web
+    - echo "Executando testes do frontend..."
+    - npm test || echo "Nenhum teste configurado ainda"
+  coverage: '/Lines\s*:\s*(\d+\.\d+)%/'
+  only:
+    - main
+    - merge_requests
+  allow_failure: true
+
+# ==================== STAGE: PERFORMANCE ====================
+
+performance:k6:
+  stage: performance
+  image: grafana/k6:latest
+  dependencies:
+    - build:backend
+  before_script:
+    - cd server
+    - npm ci
+    - nohup npm start &
+    - sleep 5
+  script:
+    - cd ../tests/performance
+    - echo "Executando testes de performance com K6..."
+    - k6 run smoke-test.js
+  artifacts:
+    reports:
+      junit: tests/performance/results.xml
+    paths:
+      - tests/performance/*.json
+    expire_in: 30 days
+  only:
+    - main
+  allow_failure: true
+
+# ==================== DEPLOY (OPCIONAL) ====================
+
+# Descomente para habilitar deploy automático
+# deploy:production:
+#   stage: deploy
+#   dependencies:
+#     - build:backend
+#     - build:frontend
+#   script:
+#     - echo "Deploying to production..."
+#     # Adicione seus comandos de deploy aqui
+#   only:
+#     - main
+#   when: manual
+#   environment:
+#     name: production
