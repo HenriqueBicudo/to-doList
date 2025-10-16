@@ -1,0 +1,155 @@
+version: 2.1
+
+# Orbs são pacotes reutilizáveis de configuração
+orbs:
+  node: circleci/node@5.1.0
+  sonarcloud: sonarsource/sonarcloud@2.0.0
+
+# Jobs são as tarefas individuais
+jobs:
+  # Job 1: Build e Test do Backend
+  test-backend:
+    docker:
+      - image: cimg/node:20.9.0
+    working_directory: ~/project/server
+    steps:
+      - checkout:
+          path: ~/project
+      - restore_cache:
+          keys:
+            - v1-backend-deps-{{ checksum "package.json" }}
+            - v1-backend-deps-
+      - run:
+          name: Install Backend Dependencies
+          command: npm install
+      - save_cache:
+          key: v1-backend-deps-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+      - run:
+          name: Build Backend
+          command: npm run build
+      - run:
+          name: Run Backend Tests
+          command: |
+            echo "Backend tests would run here"
+            echo "npm test (quando implementado)"
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - server/dist
+
+  # Job 2: Build e Test do Frontend
+  test-frontend:
+    docker:
+      - image: cimg/node:20.9.0
+    working_directory: ~/project/web
+    steps:
+      - checkout:
+          path: ~/project
+      - restore_cache:
+          keys:
+            - v1-frontend-deps-{{ checksum "package.json" }}
+            - v1-frontend-deps-
+      - run:
+          name: Install Frontend Dependencies
+          command: npm install
+      - save_cache:
+          key: v1-frontend-deps-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+      - run:
+          name: Lint Frontend
+          command: npm run lint || echo "Lint not configured"
+      - run:
+          name: Build Frontend
+          command: npm run build
+      - run:
+          name: Run Frontend Tests
+          command: |
+            echo "Frontend tests would run here"
+            echo "npm test (quando implementado)"
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - web/dist
+
+  # Job 3: Análise de Código com SonarCloud
+  sonarcloud-analysis:
+    docker:
+      - image: cimg/node:20.9.0
+    steps:
+      - checkout
+      - sonarcloud/scan:
+          cache_version: 1
+          sonar_token_variable_name: SONAR_TOKEN
+
+  # Job 4: Security Scan (simulado - Snyk seria aqui)
+  security-scan:
+    docker:
+      - image: cimg/node:20.9.0
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: |
+            cd server && npm install
+            cd ../web && npm install
+      - run:
+          name: Security Audit
+          command: |
+            echo "Running npm audit..."
+            cd server && npm audit --audit-level=moderate || true
+            cd ../web && npm audit --audit-level=moderate || true
+      - run:
+          name: Check for Vulnerabilities
+          command: |
+            echo "Security scan completed"
+            echo "In production, Snyk would run here"
+
+  # Job 5: Deploy (simulado)
+  deploy:
+    docker:
+      - image: cimg/node:20.9.0
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Deploy Application
+          command: |
+            echo "Deploying application..."
+            echo "Backend built: $(ls ~/project/server/dist || echo 'not found')"
+            echo "Frontend built: $(ls ~/project/web/dist || echo 'not found')"
+            echo "Deployment would happen here"
+
+# Workflows orquestram a execução dos jobs
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      # Testes rodam em paralelo
+      - test-backend
+      - test-frontend
+      
+      # Análise de código roda em paralelo
+      - sonarcloud-analysis:
+          context: sonarcloud
+          filters:
+            branches:
+              only: main
+      
+      # Security scan roda após os testes
+      - security-scan:
+          requires:
+            - test-backend
+            - test-frontend
+      
+      # Deploy só roda após tudo passar
+      - deploy:
+          requires:
+            - test-backend
+            - test-frontend
+            - security-scan
+          filters:
+            branches:
+              only: main

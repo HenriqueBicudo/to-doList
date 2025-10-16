@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testcases>
+  <testcase id="TC-001">
+    <title>Criar Tarefa</title>
+    <description>Validar criação de nova tarefa via API POST /tasks</description>
+    <preconditions>API rodando em http://localhost:3000</preconditions>
+    <steps>
+      <step>Enviar POST para /tasks</step>
+      <step>Body: {titulo: Nova tarefa, feito: false}</step>
+      <step>Validar resposta</step>
+    </steps>
+    <expected_result>Status: 201 Created - Retorna objeto com id, titulo, feito</expected_result>
+    <suite>API Backend</suite>
+    <priority>High</priority>
+    <severity>Critical</severity>
+    <type>Functional</type>
+    <automation>Automated</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-002">
+    <title>Listar Tarefas</title>
+    <description>Validar listagem de todas as tarefas via GET /tasks</description>
+    <preconditions>API rodando com pelo menos 1 tarefa cadastrada</preconditions>
+    <steps>
+      <step>Enviar GET para /tasks</step>
+      <step>Validar resposta</step>
+    </steps>
+    <expected_result>Status: 200 OK - Retorna array de tarefas</expected_result>
+    <suite>API Backend</suite>
+    <priority>High</priority>
+    <severity>Critical</severity>
+    <type>Functional</type>
+    <automation>Automated</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-003">
+    <title>Buscar Tarefa por ID</title>
+    <description>Validar busca de tarefa específica por ID</description>
+    <preconditions>API rodando e tarefa com ID conhecido existe</preconditions>
+    <steps>
+      <step>Enviar GET para /tasks/1</step>
+      <step>Validar resposta</step>
+    </steps>
+    <expected_result>Status: 200 OK - Retorna objeto da tarefa</expected_result>
+    <suite>API Backend</suite>
+    <priority>High</priority>
+    <severity>Major</severity>
+    <type>Functional</type>
+    <automation>Automated</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-004">
+    <title>Atualizar Tarefa</title>
+    <description>Validar atualização de tarefa existente</description>
+    <preconditions>API rodando e tarefa existente</preconditions>
+    <steps>
+      <step>Criar tarefa via POST</step>
+      <step>Enviar PUT para /tasks/1</step>
+      <step>Body: {feito: true}</step>
+      <step>Validar resposta</step>
+    </steps>
+    <expected_result>Status: 200 OK - Tarefa atualizada</expected_result>
+    <suite>API Backend</suite>
+    <priority>High</priority>
+    <severity>Major</severity>
+    <type>Functional</type>
+    <automation>Automated</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-005">
+    <title>Deletar Tarefa</title>
+    <description>Validar exclusão de tarefa</description>
+    <preconditions>API rodando e tarefa existente</preconditions>
+    <steps>
+      <step>Criar tarefa via POST</step>
+      <step>Enviar DELETE para /tasks/1</step>
+      <step>Validar resposta</step>
+    </steps>
+    <expected_result>Status: 200 ou 204 - Tarefa removida</expected_result>
+    <suite>API Backend</suite>
+    <priority>High</priority>
+    <severity>Major</severity>
+    <type>Functional</type>
+    <automation>Automated</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-006">
+    <title>Criar Tarefa sem Título</title>
+    <description>Validar erro ao criar tarefa sem título obrigatório</description>
+    <preconditions>API rodando</preconditions>
+    <steps>
+      <step>Enviar POST para /tasks</step>
+      <step>Body: {feito: false} sem titulo</step>
+    </steps>
+    <expected_result>Status: 400 Bad Request - Erro de validação</expected_result>
+    <suite>API Backend</suite>
+    <priority>High</priority>
+    <severity>Major</severity>
+    <type>Negative</type>
+    <automation>Manual</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-007">
+    <title>Buscar Tarefa Inválida</title>
+    <description>Validar erro ao buscar tarefa inexistente</description>
+    <preconditions>API rodando</preconditions>
+    <steps>
+      <step>Enviar GET para /tasks/999999</step>
+    </steps>
+    <expected_result>Status: 404 Not Found</expected_result>
+    <suite>API Backend</suite>
+    <priority>Medium</priority>
+    <severity>Normal</severity>
+    <type>Negative</type>
+    <automation>Manual</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-010">
+    <title>Health Check</title>
+    <description>Validar endpoint de health check</description>
+    <preconditions>API rodando</preconditions>
+    <steps>
+      <step>Enviar GET para /health</step>
+    </steps>
+    <expected_result>Status: 200 OK - Retorna status da API</expected_result>
+    <suite>API Backend</suite>
+    <priority>High</priority>
+    <severity>Major</severity>
+    <type>Functional</type>
+    <automation>Automated</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-013">
+    <title>Renderizar Lista de Tarefas</title>
+    <description>Verificar renderização da lista no frontend</description>
+    <preconditions>Frontend e backend rodando</preconditions>
+    <steps>
+      <step>Acessar http://localhost:5173</step>
+      <step>Aguardar carregamento</step>
+      <step>Verificar lista de tarefas</step>
+    </steps>
+    <expected_result>Lista visível com todas as tarefas</expected_result>
+    <suite>Frontend UI</suite>
+    <priority>High</priority>
+    <severity>Critical</severity>
+    <type>UI</type>
+    <automation>Automated</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-014">
+    <title>Criar Tarefa via Interface</title>
+    <description>Validar criação de tarefa pela interface do usuário</description>
+    <preconditions>Aplicação rodando</preconditions>
+    <steps>
+      <step>Localizar campo de input</step>
+      <step>Digitar: Nova tarefa teste</step>
+      <step>Clicar no botão Adicionar</step>
+      <step>Validar aparição na lista</step>
+    </steps>
+    <expected_result>Tarefa aparece na lista - Campo limpo</expected_result>
+    <suite>Frontend UI</suite>
+    <priority>High</priority>
+    <severity>Critical</severity>
+    <type>UI</type>
+    <automation>Automated</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-015">
+    <title>Marcar Tarefa como Concluída</title>
+    <description>Validar checkbox de conclusão</description>
+    <preconditions>Aplicação rodando com tarefa existente</preconditions>
+    <steps>
+      <step>Localizar checkbox da tarefa</step>
+      <step>Clicar no checkbox</step>
+      <step>Validar mudança visual</step>
+    </steps>
+    <expected_result>Checkbox marcado - Estilo visual alterado</expected_result>
+    <suite>Frontend UI</suite>
+    <priority>High</priority>
+    <severity>Major</severity>
+    <type>UI</type>
+    <automation>Automated</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-018">
+    <title>Responsividade Mobile</title>
+    <description>Validar layout responsivo em dispositivos móveis</description>
+    <preconditions>Aplicação rodando</preconditions>
+    <steps>
+      <step>Abrir em dispositivo mobile</step>
+      <step>Testar funcionalidades</step>
+      <step>Verificar layout</step>
+    </steps>
+    <expected_result>Layout adaptado - Touch events OK - Sem scroll horizontal</expected_result>
+    <suite>Frontend UI</suite>
+    <priority>High</priority>
+    <severity>Major</severity>
+    <type>UI</type>
+    <automation>Automated</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-021">
+    <title>Smoke Test K6</title>
+    <description>Validação básica com carga mínima</description>
+    <preconditions>API rodando e K6 instalado</preconditions>
+    <steps>
+      <step>Executar: k6 run smoke-test.js</step>
+      <step>Aguardar conclusão 1 minuto</step>
+      <step>Analisar resultados</step>
+    </steps>
+    <expected_result>1 VU - p99 menor 1000ms - Taxa erro menor 1%</expected_result>
+    <suite>Performance</suite>
+    <priority>High</priority>
+    <severity>Critical</severity>
+    <type>Performance</type>
+    <automation>Automated</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-022">
+    <title>Load Test K6</title>
+    <description>Teste de carga com múltiplos usuários</description>
+    <preconditions>API rodando e K6 instalado</preconditions>
+    <steps>
+      <step>Executar: k6 run load-test.js</step>
+      <step>Aguardar 3 minutos</step>
+      <step>Analisar métricas</step>
+    </steps>
+    <expected_result>10-50-100 VUs - p95 menor 500ms - p99 menor 1000ms</expected_result>
+    <suite>Performance</suite>
+    <priority>High</priority>
+    <severity>Critical</severity>
+    <type>Performance</type>
+    <automation>Automated</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-023">
+    <title>Stress Test K6</title>
+    <description>Identificar ponto de quebra do sistema</description>
+    <preconditions>API rodando e K6 instalado</preconditions>
+    <steps>
+      <step>Executar: k6 run stress-test.js</step>
+      <step>Aguardar 20 minutos</step>
+      <step>Identificar limite</step>
+    </steps>
+    <expected_result>100-200-300 VUs - Identificar ponto de quebra</expected_result>
+    <suite>Performance</suite>
+    <priority>Medium</priority>
+    <severity>Major</severity>
+    <type>Performance</type>
+    <automation>Automated</automation>
+    <status>Draft</status>
+  </testcase>
+
+  <testcase id="TC-024">
+    <title>Compatibilidade Chrome Desktop</title>
+    <description>Validar compatibilidade no Chrome</description>
+    <preconditions>BrowserStack ativo e aplicação rodando</preconditions>
+    <steps>
+      <step>Abrir Chrome 120 Windows 11</step>
+      <step>Acessar aplicação</step>
+      <step>Testar CRUD completo</step>
+    </steps>
+    <expected_result>100% compatível - Todas funcionalidades OK</expected_result>
+    <suite>Cross-Browser</suite>
+    <priority>High</priority>
+    <severity>Critical</severity>
+    <type>Compatibility</type>
+    <automation>Manual</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-025">
+    <title>Compatibilidade Firefox Desktop</title>
+    <description>Validar compatibilidade no Firefox</description>
+    <preconditions>BrowserStack ativo e aplicação rodando</preconditions>
+    <steps>
+      <step>Abrir Firefox 121 Windows 11</step>
+      <step>Acessar aplicação</step>
+      <step>Testar funcionalidades</step>
+    </steps>
+    <expected_result>100% compatível - Sem bugs</expected_result>
+    <suite>Cross-Browser</suite>
+    <priority>High</priority>
+    <severity>Major</severity>
+    <type>Compatibility</type>
+    <automation>Manual</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-026">
+    <title>Compatibilidade Safari Desktop</title>
+    <description>Validar compatibilidade no Safari</description>
+    <preconditions>BrowserStack ativo e aplicação rodando</preconditions>
+    <steps>
+      <step>Abrir Safari 17.2 macOS</step>
+      <step>Acessar aplicação</step>
+      <step>Testar funcionalidades</step>
+    </steps>
+    <expected_result>95% compatível - Delay 500ms aceitável</expected_result>
+    <suite>Cross-Browser</suite>
+    <priority>High</priority>
+    <severity>Major</severity>
+    <type>Compatibility</type>
+    <automation>Manual</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-027">
+    <title>Compatibilidade Chrome Mobile</title>
+    <description>Validar em Chrome Android</description>
+    <preconditions>BrowserStack ativo e aplicação rodando</preconditions>
+    <steps>
+      <step>Abrir Chrome Mobile Android 13</step>
+      <step>Testar touch events</step>
+      <step>Verificar responsividade</step>
+    </steps>
+    <expected_result>100% compatível - Touch events OK</expected_result>
+    <suite>Cross-Browser</suite>
+    <priority>High</priority>
+    <severity>Major</severity>
+    <type>Compatibility</type>
+    <automation>Manual</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-028">
+    <title>Compatibilidade Safari Mobile</title>
+    <description>Validar em Safari iOS</description>
+    <preconditions>BrowserStack ativo e aplicação rodando</preconditions>
+    <steps>
+      <step>Abrir Safari Mobile iOS 17</step>
+      <step>Testar em iPhone</step>
+      <step>Verificar funcionalidades</step>
+    </steps>
+    <expected_result>100% compatível - Safe area OK</expected_result>
+    <suite>Cross-Browser</suite>
+    <priority>High</priority>
+    <severity>Major</severity>
+    <type>Compatibility</type>
+    <automation>Manual</automation>
+    <status>Actual</status>
+  </testcase>
+
+  <testcase id="TC-029">
+    <title>SQL Injection</title>
+    <description>Validar proteção contra SQL Injection</description>
+    <preconditions>API rodando</preconditions>
+    <steps>
+      <step>Tentar injetar SQL no título</step>
+      <step>Verificar sanitização</step>
+    </steps>
+    <expected_result>Input sanitizado - Query maliciosa bloqueada</expected_result>
+    <suite>Security</suite>
+    <priority>High</priority>
+    <severity>Critical</severity>
+    <type>Security</type>
+    <automation>Manual</automation>
+    <status>Draft</status>
+  </testcase>
+
+  <testcase id="TC-030">
+    <title>XSS Protection</title>
+    <description>Validar proteção contra Cross-Site Scripting</description>
+    <preconditions>Aplicação rodando</preconditions>
+    <steps>
+      <step>Inserir script malicioso</step>
+      <step>Verificar se executa</step>
+    </steps>
+    <expected_result>Script não executado - HTML escapado</expected_result>
+    <suite>Security</suite>
+    <priority>High</priority>
+    <severity>Critical</severity>
+    <type>Security</type>
+    <automation>Manual</automation>
+    <status>Draft</status>
+  </testcase>
+
+  <testcase id="TC-031">
+    <title>Scan Vulnerabilidades Snyk</title>
+    <description>Escanear vulnerabilidades de dependências</description>
+    <preconditions>Snyk configurado e projeto no GitHub</preconditions>
+    <steps>
+      <step>Executar scan do Snyk</step>
+      <step>Analisar relatório</step>
+      <step>Documentar issues</step>
+    </steps>
+    <expected_result>Vulnerabilidades identificadas e documentadas</expected_result>
+    <suite>Security</suite>
+    <priority>High</priority>
+    <severity>Major</severity>
+    <type>Security</type>
+    <automation>Automated</automation>
+    <status>Draft</status>
+  </testcase>
+
+  <testcase id="TC-032">
+    <title>Rate Limiting</title>
+    <description>Validar implementação de rate limiting</description>
+    <preconditions>API rodando</preconditions>
+    <steps>
+      <step>Enviar muitas requisições rapidamente</step>
+      <step>Verificar limite</step>
+    </steps>
+    <expected_result>Status 429 após limite - Proteção ativa</expected_result>
+    <suite>Security</suite>
+    <priority>Medium</priority>
+    <severity>Normal</severity>
+    <type>Security</type>
+    <automation>Automated</automation>
+    <status>Deprecated</status>
+  </testcase>
+</testcases>

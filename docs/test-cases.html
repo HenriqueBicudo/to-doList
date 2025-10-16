@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Testes - Task Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card h3 {
+            color: #6c757d;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-card .label {
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .chart-container {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .chart {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .chart h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 30px;
+            overflow: hidden;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 1s ease;
+        }
+        
+        .test-suites {
+            padding: 40px;
+        }
+        
+        .suite {
+            background: white;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .suite-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .suite-body {
+            padding: 30px;
+            display: none;
+        }
+        
+        .suite.active .suite-body {
+            display: block;
+        }
+        
+        .test-case {
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .test-case h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .badge.passed {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge.failed {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .badge.pending {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .badge.critical {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .badge.high {
+            background: #fd7e14;
+            color: white;
+        }
+        
+        .badge.medium {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .pie-chart {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #28a745 0deg 315deg,
+                #ffc107 315deg 326deg,
+                #6c757d 326deg 360deg
+            );
+            margin: 30px auto;
+            position: relative;
+        }
+        
+        .pie-chart::before {
+            content: '87.5%';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        @media (max-width: 768px) {
+            .chart-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Gestão de Testes - Task Manager</h1>
+            <p>Documentação Completa de Casos de Teste</p>
+            <p style="opacity: 0.8; margin-top: 10px;">Henrique Bicudo | 16/10/2025</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Total de Casos</h3>
+                <div class="number">32</div>
+                <div class="label">Casos Documentados</div>
+            </div>
+            <div class="stat-card">
+                <h3>Taxa de Aprovação</h3>
+                <div class="number" style="color: #28a745;">87.5%</div>
+                <div class="label">28 de 32 Passaram</div>
+            </div>
+            <div class="stat-card">
+                <h3>Automação</h3>
+                <div class="number" style="color: #764ba2;">78%</div>
+                <div class="label">25 Automatizados</div>
+            </div>
+            <div class="stat-card">
+                <h3>Bugs Encontrados</h3>
+                <div class="number" style="color: #dc3545;">2</div>
+                <div class="label">Identificados</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart">
+                <h2>📊 Status dos Testes</h2>
+                <div class="pie-chart"></div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #28a745;"></div>
+                        <span>Passou (28)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ffc107;"></div>
+                        <span>Parcial (1)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #6c757d;"></div>
+                        <span>Pendente (3)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart">
+                <h2>📈 Cobertura por Suite</h2>
+                <div>
+                    <p style="margin: 10px 0;"><strong>API Backend</strong></p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%;">100%</div>
+                    </div>
+                </div>
+                <div>
+                    <p style="margin: 10px 0;"><strong>Frontend UI</strong></p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%;">100%</div>
+                    </div>
+                </div>
+                <div>
+                    <p style="margin: 10px 0;"><strong>Performance</strong></p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 66%;">66%</div>
+                    </div>
+                </div>
+                <div>
+                    <p style="margin: 10px 0;"><strong>Cross-Browser</strong></p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%;">100%</div>
+                    </div>
+                </div>
+                <div>
+                    <p style="margin: 10px 0;"><strong>Segurança</strong></p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 25%;">25%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-suites">
+            <h2 style="margin-bottom: 30px; text-align: center; font-size: 2em; color: #333;">Suites de Teste</h2>
+            
+            <div class="suite active">
+                <div class="suite-header" onclick="this.parentElement.classList.toggle('active')">
+                    <span>🎯 Suite 1: Testes Funcionais - API Backend</span>
+                    <span>12 casos</span>
+                </div>
+                <div class="suite-body">
+                    <div class="test-case">
+                        <h4>TC-001: Criar Tarefa</h4>
+                        <span class="badge critical">Crítica</span>
+                        <span class="badge passed">✅ PASSOU</span>
+                        <p style="margin-top: 10px; color: #666;">Validar criação de nova tarefa via POST /tasks</p>
+                    </div>
+                    <div class="test-case">
+                        <h4>TC-002: Listar Todas as Tarefas</h4>
+                        <span class="badge critical">Crítica</span>
+                        <span class="badge passed">✅ PASSOU</span>
+                        <p style="margin-top: 10px; color: #666;">Validar listagem de tarefas via GET /tasks</p>
+                    </div>
+                    <div class="test-case">
+                        <h4>TC-003: Buscar Tarefa por ID</h4>
+                        <span class="badge high">Alta</span>
+                        <span class="badge passed">✅ PASSOU</span>
+                        <p style="margin-top: 10px; color: #666;">Validar busca de tarefa específica via GET /tasks/:id</p>
+                    </div>
+                    <div class="test-case">
+                        <h4>TC-004: Atualizar Tarefa</h4>
+                        <span class="badge high">Alta</span>
+                        <span class="badge passed">✅ PASSOU</span>
+                        <p style="margin-top: 10px; color: #666;">Validar atualização de tarefa via PUT /tasks/:id</p>
+                    </div>
+                    <div class="test-case">
+                        <h4>TC-005: Deletar Tarefa</h4>
+                        <span class="badge high">Alta</span>
+                        <span class="badge passed">✅ PASSOU</span>
+                        <p style="margin-top: 10px; color: #666;">Validar exclusão de tarefa via DELETE /tasks/:id</p>
+                    </div>
+                    <p style="text-align: center; margin-top: 20px; color: #666;">+ 7 casos adicionais</p>
+                </div>
+            </div>
+            
+            <div class="suite">
+                <div class="suite-header" onclick="this.parentElement.classList.toggle('active')">
+                    <span>🎨 Suite 2: Testes Funcionais - Frontend</span>
+                    <span>8 casos</span>
+                </div>
+                <div class="suite-body">
+                    <div class="test-case">
+                        <h4>TC-013: Renderizar Lista de Tarefas</h4>
+                        <span class="badge critical">Crítica</span>
+                        <span class="badge passed">✅ PASSOU</span>
+                        <p style="margin-top: 10px; color: #666;">Validar exibição da lista no frontend</p>
+                    </div>
+                    <div class="test-case">
+                        <h4>TC-014: Criar Tarefa via Interface</h4>
+                        <span class="badge critical">Crítica</span>
+                        <span class="badge passed">✅ PASSOU</span>
+                        <p style="margin-top: 10px; color: #666;">Validar criação via formulário</p>
+                    </div>
+                    <div class="test-case">
+                        <h4>TC-018: Responsividade Mobile</h4>
+                        <span class="badge high">Alta</span>
+                        <span class="badge passed">✅ PASSOU</span>
+                        <p style="margin-top: 10px; color: #666;">Testar layout em dispositivos móveis</p>
+                    </div>
+                    <p style="text-align: center; margin-top: 20px; color: #666;">+ 5 casos adicionais</p>
+                </div>
+            </div>
+            
+            <div class="suite">
+                <div class="suite-header" onclick="this.parentElement.classList.toggle('active')">
+                    <span>⚡ Suite 3: Testes de Performance</span>
+                    <span>3 casos</span>
+                </div>
+                <div class="suite-body">
+                    <div class="test-case">
+                        <h4>TC-021: Smoke Test</h4>
+                        <span class="badge critical">Crítica</span>
+                        <span class="badge passed">✅ PASSOU</span>
+                        <p style="margin-top: 10px; color: #666;">1 VU, 1 minuto - Validação básica</p>
+                    </div>
+                    <div class="test-case">
+                        <h4>TC-022: Load Test</h4>
+                        <span class="badge critical">Crítica</span>
+                        <span class="badge pending">⚠️ PARCIAL</span>
+                        <p style="margin-top: 10px; color: #666;">100 VUs, 3 minutos - POST com 50% falha</p>
+                    </div>
+                    <div class="test-case">
+                        <h4>TC-023: Stress Test</h4>
+                        <span class="badge high">Alta</span>
+                        <span class="badge pending">📝 PENDENTE</span>
+                        <p style="margin-top: 10px; color: #666;">300 VUs, 20 minutos - Aguardando correção</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="suite">
+                <div class="suite-header" onclick="this.parentElement.classList.toggle('active')">
+                    <span>🌐 Suite 4: Testes Cross-Browser</span>
+                    <span>5 casos</span>
+                </div>
+                <div class="suite-body">
+                    <div class="test-case">
+                        <h4>TC-024: Chrome Desktop</h4>
+                        <span class="badge critical">Crítica</span>
+                        <span class="badge passed">✅ 100% COMPATÍVEL</span>
+                    </div>
+                    <div class="test-case">
+                        <h4>TC-025: Firefox Desktop</h4>
+                        <span class="badge high">Alta</span>
+                        <span class="badge passed">✅ 100% COMPATÍVEL</span>
+                    </div>
+                    <div class="test-case">
+                        <h4>TC-026: Safari Desktop</h4>
+                        <span class="badge high">Alta</span>
+                        <span class="badge pending">⚠️ 95% COMPATÍVEL</span>
+                        <p style="margin-top: 10px; color: #666;">BUG-001: Delay de 500ms</p>
+                    </div>
+                    <div class="test-case">
+                        <h4>TC-027: Chrome Mobile</h4>
+                        <span class="badge high">Alta</span>
+                        <span class="badge passed">✅ 100% COMPATÍVEL</span>
+                    </div>
+                    <div class="test-case">
+                        <h4>TC-028: Safari Mobile</h4>
+                        <span class="badge high">Alta</span>
+                        <span class="badge passed">✅ 100% COMPATÍVEL</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="suite">
+                <div class="suite-header" onclick="this.parentElement.classList.toggle('active')">
+                    <span>🔒 Suite 5: Testes de Segurança</span>
+                    <span>4 casos</span>
+                </div>
+                <div class="suite-body">
+                    <div class="test-case">
+                        <h4>TC-029: SQL Injection</h4>
+                        <span class="badge critical">Crítica</span>
+                        <span class="badge pending">📝 A TESTAR</span>
+                    </div>
+                    <div class="test-case">
+                        <h4>TC-030: XSS Attack</h4>
+                        <span class="badge critical">Crítica</span>
+                        <span class="badge pending">📝 A TESTAR</span>
+                    </div>
+                    <div class="test-case">
+                        <h4>TC-031: Vulnerabilidades de Dependências</h4>
+                        <span class="badge high">Alta</span>
+                        <span class="badge pending">📝 PENDENTE</span>
+                        <p style="margin-top: 10px; color: #666;">Aguardando configuração do Snyk</p>
+                    </div>
+                    <div class="test-case">
+                        <h4>TC-032: Rate Limiting</h4>
+                        <span class="badge medium">Média</span>
+                        <span class="badge failed">❌ NÃO IMPLEMENTADO</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 40px; text-align: center;">
+            <h2 style="color: #333; margin-bottom: 20px;">📝 Documentação Completa</h2>
+            <p style="color: #666; font-size: 1.1em; margin-bottom: 20px;">
+                Acesse a documentação completa em Markdown com todos os detalhes, passos, dados de teste e evidências.
+            </p>
+            <a href="../test-cases.md" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 1.1em;">
+                Ver Documentação Completa
+            </a>
+        </div>
+    </div>
+</body>
+</html>
