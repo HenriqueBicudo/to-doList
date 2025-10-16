@@ -28,24 +28,49 @@ Write-Host "  1. Smoke Test (validação básica - 1 minuto)" -ForegroundColor W
 Write-Host "  2. Load Test (teste de carga - 3 minutos)" -ForegroundColor White
 Write-Host "  3. Stress Test (teste de estresse - 20 minutos)" -ForegroundColor White
 Write-Host ""
+Write-Host "Enviar resultados para K6 Cloud?" -ForegroundColor Cyan
+Write-Host "  S. Sim (dashboards gráficos no navegador)" -ForegroundColor White
+Write-Host "  N. Não (apenas terminal)" -ForegroundColor White
+Write-Host ""
 
 $choice = Read-Host "Digite o número (1-3)"
+$useCloud = Read-Host "Usar K6 Cloud? (S/N)"
+
+$cloudOutput = ""
+if ($useCloud -eq "S" -or $useCloud -eq "s") {
+    $cloudOutput = "--out cloud"
+    Write-Host ""
+    Write-Host "💡 Dica: Acesse https://app.k6.io/runs para ver os dashboards!" -ForegroundColor Yellow
+    Write-Host ""
+}
 
 switch ($choice) {
     "1" {
         Write-Host ""
         Write-Host "Executando Smoke Test..." -ForegroundColor Green
-        & "C:\Program Files\k6\k6.exe" run tests/performance/smoke-test.js
+        if ($cloudOutput) {
+            & "C:\Program Files\k6\k6.exe" run $cloudOutput tests/performance/smoke-test.js
+        } else {
+            & "C:\Program Files\k6\k6.exe" run tests/performance/smoke-test.js
+        }
     }
     "2" {
         Write-Host ""
         Write-Host "Executando Load Test..." -ForegroundColor Green
-        & "C:\Program Files\k6\k6.exe" run tests/performance/load-test.js
+        if ($cloudOutput) {
+            & "C:\Program Files\k6\k6.exe" run $cloudOutput tests/performance/load-test.js
+        } else {
+            & "C:\Program Files\k6\k6.exe" run tests/performance/load-test.js
+        }
     }
     "3" {
         Write-Host ""
         Write-Host "Executando Stress Test..." -ForegroundColor Green
-        & "C:\Program Files\k6\k6.exe" run tests/performance/stress-test.js
+        if ($cloudOutput) {
+            & "C:\Program Files\k6\k6.exe" run $cloudOutput tests/performance/stress-test.js
+        } else {
+            & "C:\Program Files\k6\k6.exe" run tests/performance/stress-test.js
+        }
     }
     default {
         Write-Host "Opção inválida!" -ForegroundColor Red
